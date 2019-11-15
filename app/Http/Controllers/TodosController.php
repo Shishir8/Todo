@@ -14,7 +14,7 @@ class TodosController extends Controller
      */
     public function index()
     {
-        return view('index');
+        return view('index')->with('todos',Todo::all());
     }
 
     /**
@@ -56,9 +56,9 @@ class TodosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Todo $todo)
     {
-        //
+        return view('show')->with('todo',$todo);
     }
 
     /**
@@ -67,9 +67,10 @@ class TodosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(todo $todo)
     {
-        //
+        return view('edit')->with('todo',$todo);
+        
     }
 
     /**
@@ -79,9 +80,21 @@ class TodosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Todo $todo)
     {
-        //
+        $this->validate(request(),[
+            'title' => 'required',
+            'description' => 'required'
+            
+            ]);
+            $data = request()->all();
+        
+            $todo->title = $data['title'];
+            $todo->description = $data['description'];
+            $todo->save();
+            
+            session()->flash('success',"Data Update successfully");
+            return redirect('/todos');
     }
 
     /**
@@ -90,8 +103,10 @@ class TodosController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Todo $todo)
     {
-        //
+        $todo->delete();
+        session()->flash('delete',"Task delete successfully.");
+        return redirect('/todos');
     }
 }
